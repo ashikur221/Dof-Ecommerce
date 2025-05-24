@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaAngleDown } from 'react-icons/fa';
 import { MdOutlinePhoneInTalk } from 'react-icons/md';
 import { Link, NavLink } from "react-router-dom";
+import { assets } from '../lib/data/Assets';
 const MainLink = () => {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -10,9 +11,7 @@ const MainLink = () => {
   const mobileLinks = [
     { 'name': "Home", "link": "/" },
     { 'name': "Shop", "link": "/shop" },
-    { 'name': "Pages", "link": "/stack-overflow" },
     { 'name': "Blogs", "link": "/blogs" },
-    { 'name': "About Us", "link": "/about-us" },
     { 'name': "Contact Us", "link": "/contact-us" },
 
   ]
@@ -27,9 +26,9 @@ const MainLink = () => {
 
   return (
     <div>
-      <nav className="bg-gray-900 text-white p-4 hidden lg:block">
+      <nav className="bg-orange-500 text-white text-xl p-4 hidden lg:block">
         <div className="container mx-auto flex justify-between items-center">
-          <ul className="flex space-x-6">
+          <ul className="flex space-x-6 text-[16px]">
             <li>
               <NavLink
                 to="/"
@@ -37,7 +36,7 @@ const MainLink = () => {
                   isActive ? "font-bold text-white" : "hover:text-gray-400"
                 }
               >
-                <p className="flex items-center gap-1">Home<FaAngleDown /></p>
+                <p className="flex items-center gap-1">Home</p>
               </NavLink>
             </li>
             <li>
@@ -47,20 +46,10 @@ const MainLink = () => {
                   isActive ? "font-bold text-white" : "hover:text-gray-400"
                 }
               >
-                <p className="flex items-center gap-1">Shop<FaAngleDown /></p>
+                <p className="flex items-center gap-1">Shop</p>
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/pages"
-                className={({ isActive }) =>
-                  isActive ? "font-bold text-white" : "hover:text-gray-400"
-                }
-              >
-
-                <p className="flex items-center gap-1">Pages<FaAngleDown /></p>
-              </NavLink>
-            </li>
+            
             <li>
               <NavLink
                 to="/blog"
@@ -69,20 +58,11 @@ const MainLink = () => {
                 }
               >
 
-                <p className="flex items-center gap-1">Blog<FaAngleDown /></p>
+                <p className="flex items-center gap-1">Blog</p>
 
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/about-us"
-                className={({ isActive }) =>
-                  isActive ? "font-bold text-white" : "hover:text-gray-400"
-                }
-              >
-                About Us
-              </NavLink>
-            </li>
+            
             <li>
               <NavLink
                 to="/contact-us"
@@ -96,7 +76,7 @@ const MainLink = () => {
           </ul>
           <div className="flex items-center gap-2">
             <span className="text-gray-400 text-xl"><MdOutlinePhoneInTalk /></span>
-            <span className="ml-2">(+088) 1755-450127</span>
+            <span className="ml-2">(+088) 1813387605</span>
           </div>
         </div>
       </nav>
@@ -127,9 +107,9 @@ const MainLink = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="">
-                  <img src="https://res.cloudinary.com/deifi77os/image/upload/v1736661929/GreenFrams/Public/ympwetlspx7lk3dkyu5g.png" alt="" />
+                  <img src={assets.logo} alt="" className='w-12' />
                 </div>
-                <p className="text-2xl font-semibold">GreenFarms</p>
+                <p className="text-2xl font-semibold">MozumderShopBd</p>
               </div>
 
             </div>

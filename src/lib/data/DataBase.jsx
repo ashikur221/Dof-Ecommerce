@@ -23,6 +23,37 @@ import insta3 from '@/assets/images/social/insta/insta3.png';
 import insta4 from '@/assets/images/social/insta/insta4.png';
 import insta5 from '@/assets/images/social/insta/insta5.png';
 import insta6 from '@/assets/images/social/insta/insta6.png';
+import { assets } from './Assets'
+
+export const dofProducts = [
+  {
+    id: 'daf14',
+    name: '১৪" সাইজ দফ',
+    image: assets.daf14,
+    price: 2700,
+    discountPrice: 2550,
+    description: '১৪ ইঞ্চির দফ, সাউন্ড কোয়ালিটি ও ব্যবহারে হালকা। মাহফিল ও বাসায় ব্যবহারে আদর্শ।',
+    specs: ['সাইজ: ১৪ ইঞ্চি', 'মেটেরিয়াল: কাঠ ও চামড়া', 'ওজন: ১.০ কেজি']
+  },
+  {
+    id: 'daf16',
+    name: '১৬" সাইজ দফ',
+    image: assets.daf16,
+    price: 3000,
+    discountPrice: 2750,
+    description: '১৬ ইঞ্চির দফ, মজবুত কাঠ, মসজিদ ও ইভেন্টে ব্যবহারের জন্য উপযোগী।',
+    specs: ['সাইজ: ১৬ ইঞ্চি', 'মেটেরিয়াল: উন্নত কাঠ', 'ওজন: ১.২ কেজি']
+  },
+  {
+    id: 'daf18',
+    name: '১৮" সাইজ দফ',
+    image: assets.daf18,
+    price: 3500,
+    discountPrice: 2950,
+    description: '১৮ ইঞ্চির বড় দফ, গভীর সাউন্ড ও প্রো পারফর্মারদের জন্য তৈরি।',
+    specs: ['সাইজ: ১৮ ইঞ্চি', 'মেটেরিয়াল: হাই গ্রেড কাঠ', 'ওজন: ১.৫ কেজি']
+  }
+];
 
 
 const latestNews = [
