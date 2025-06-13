@@ -8,7 +8,7 @@ import Navbar from '../components/MainNavbar';
 const Mainlayout = () => {
   return (
     <div>
-      {/* <Topbar /> */}
+      <Topbar />
       <Navbar/>
       <Outlet></Outlet>
       <MainFooter/>

@@ -10,6 +10,7 @@ import Testimonial from './homeComponents/Testimonial';
 import SocialSection from './homeComponents/SocialSection';
 import DofCard from './homeComponents/DofCard';
 import OrderForm from '../../../components/OrderForm';
+import VideoGallary from './homeComponents/VideoGallary';
 
 const HomePage = () => {
   return (
@@ -17,6 +18,7 @@ const HomePage = () => {
       <HomeBanner />
       <KeyPoints />
       <DofCard />
+      <VideoGallary/>
       <OrderForm/>
       
     </div>

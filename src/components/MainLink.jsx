@@ -26,7 +26,7 @@ const MainLink = () => {
 
   return (
     <div>
-      <nav className="bg-orange-500 text-white text-xl p-4 hidden lg:block">
+      <nav className="bg-[#f59121] text-white text-xl p-4 hidden lg:block">
         <div className="container mx-auto flex justify-between items-center">
           <ul className="flex space-x-6 text-[16px]">
             <li>
@@ -75,7 +75,7 @@ const MainLink = () => {
             </li>
           </ul>
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 text-xl"><MdOutlinePhoneInTalk /></span>
+            <span className="text-white text-xl"><MdOutlinePhoneInTalk /></span>
             <span className="ml-2">(+088) 1813387605</span>
           </div>
         </div>

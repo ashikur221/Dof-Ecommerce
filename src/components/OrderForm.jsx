@@ -1,34 +1,69 @@
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { dofProducts } from '../lib/data/DataBase';
 
 const OrderForm = () => {
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const [selectedProduct, setSelectedProduct] = useState(dofProducts[0]);
-  const [delivery, setDelivery] = useState(50); // Default: Inside Dhaka
+  const [delivery, setDelivery] = useState(70); // Default: Inside Dhaka
 
   const subtotal = selectedProduct.discountPrice;
   const total = subtotal + delivery;
+
+  const onSubmit = (data) => {
+    const fullData = {
+      ...data,
+      product: selectedProduct,
+      delivery,
+      subtotal,
+      total
+    };
+    console.log("✅ Order Placed:", fullData);
+    alert("Your order has been placed!");
+  };
 
   return (
     <div className="w-11/12 max-w-3xl mx-auto my-10">
       <h2 className="text-2xl font-bold mb-6 text-[#f59121]">Billing & Shipping</h2>
 
-      <form className="space-y-4 bg-white p-6 rounded shadow-md">
-        {/* User Inputs */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-white p-6 rounded shadow-md">
+        {/* Name */}
         <div>
           <label className="block font-medium">আপনার নাম *</label>
-          <input type="text" placeholder="আপনার নাম লিখুন..." className="w-full border px-4 py-2 rounded mt-1" required />
+          <input
+            {...register("name", { required: true })}
+            type="text"
+            placeholder="আপনার নাম লিখুন..."
+            className="w-full border px-4 py-2 rounded mt-1"
+          />
+          {errors.name && <p className="text-red-500 text-sm">নাম প্রয়োজন</p>}
         </div>
 
+        {/* Phone */}
         <div>
           <label className="block font-medium">মোবাইল নাম্বার *</label>
-          <input type="tel" placeholder="আপনার মোবাইল নাম্বার লিখুন..." className="w-full border px-4 py-2 rounded mt-1" required />
+          <input
+            {...register("phone", { required: true })}
+            type="tel"
+            placeholder="আপনার মোবাইল নাম্বার লিখুন..."
+            className="w-full border px-4 py-2 rounded mt-1"
+          />
+          {errors.phone && <p className="text-red-500 text-sm">মোবাইল নাম্বার প্রয়োজন</p>}
         </div>
 
+        {/* Address */}
         <div>
           <label className="block font-medium">আপনার ঠিকানা *</label>
-          <input type="text" placeholder="আপনার ঠিকানা লিখুন..." className="w-full border px-4 py-2 rounded mt-1" required />
+          <input
+            {...register("address", { required: true })}
+            type="text"
+            placeholder="আপনার ঠিকানা লিখুন..."
+            className="w-full border px-4 py-2 rounded mt-1"
+          />
+          {errors.address && <p className="text-red-500 text-sm">ঠিকানা প্রয়োজন</p>}
         </div>
 
+        {/* Product Selector */}
         <div>
           <label className="block font-medium">প্রোডাক্ট নির্বাচন করুন *</label>
           <select
@@ -47,16 +82,27 @@ const OrderForm = () => {
           </select>
         </div>
 
+        {/* Delivery Option */}
         <div>
           <label className="block font-medium mb-2">ডেলিভারি অপশন:</label>
           <div className="flex flex-col sm:flex-row gap-4">
             <label className="flex items-center gap-2">
-              <input type="radio" name="delivery" value={50} checked={delivery === 50} onChange={() => setDelivery(50)} />
-              Inside Dhaka (+৫০৳)
+              <input
+                type="radio"
+                value={70}
+                checked={delivery === 70}
+                onChange={() => setDelivery(70)}
+              />
+              Inside Dhaka (+৭০৳)
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="delivery" value={80} checked={delivery === 80} onChange={() => setDelivery(80)} />
-              Outside Dhaka (+৮০৳)
+              <input
+                type="radio"
+                value={130}
+                checked={delivery === 130}
+                onChange={() => setDelivery(130)}
+              />
+              Outside Dhaka (+১৩০৳)
             </label>
           </div>
         </div>
@@ -78,7 +124,7 @@ const OrderForm = () => {
           </div>
         </div>
 
-        {/* Payment Method (Fixed) */}
+        {/* Payment Method */}
         <div className="bg-gray-100 p-4 rounded text-gray-700 text-sm">
           <p><strong>Cash on Delivery</strong> – পণ্য হাতে পাওয়ার পর পেমেন্ট করুন।</p>
         </div>
