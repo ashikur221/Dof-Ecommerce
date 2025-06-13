@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { dofProducts } from '../lib/data/DataBase';
+import useAxiosPublic from '../hooks/useAxiosPublic';
+import toast from 'react-hot-toast';
 
 const OrderForm = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -9,8 +11,9 @@ const OrderForm = () => {
 
   const subtotal = selectedProduct.discountPrice;
   const total = subtotal + delivery;
+  const axiosPublic = useAxiosPublic();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const fullData = {
       ...data,
       product: selectedProduct,
@@ -19,7 +22,17 @@ const OrderForm = () => {
       total
     };
     console.log("✅ Order Placed:", fullData);
-    alert("Your order has been placed!");
+    const toastId = toast.loading('Uploading....')
+    try {
+      const res = await axiosPublic.post('/order', fullData);
+      if (res) {
+        console.log(res?.data);
+        toast.success('Your form submitted successfully', { id: toastId });
+      }
+    } catch (error) {
+      toast.error('some error occurred', { id: toastId });
+      console.log(error);
+    }
   };
 
   return (

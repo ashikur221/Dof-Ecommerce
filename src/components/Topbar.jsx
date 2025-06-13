@@ -2,6 +2,7 @@ import React from 'react';
 import { FaAngleDown, FaFacebook, FaPhone, FaYoutube } from 'react-icons/fa';
 import { FiMapPin } from 'react-icons/fi';
 import { MdEmail, MdPhone } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
 const Topbar = () => {
   return (
@@ -11,7 +12,7 @@ const Topbar = () => {
           <div className="flex items-center gap-2">
             <MdPhone />
             <p className="">(+088) 1813387605</p>
-            <p className="flex items-center gap-2"><MdEmail />info@gmail.com</p>
+            <p className="flex items-center gap-2"><MdEmail />info@mozumdershopbd.com</p>
           </div>
           {/* <div className="flex justify-center items-center gap-3">
             <p className='flex items-center'>Eng<FaAngleDown /></p>
@@ -19,8 +20,11 @@ const Topbar = () => {
             <p>Sign In / Sign Up</p>
           </div> */}
           <div className="text-xl flex gap-3">
-            <FaFacebook />
-            <FaYoutube />
+            <Link to={'https://www.facebook.com/share/1C1p37CKr8/'} target='_blank'>
+              <FaFacebook />
+            </Link>
+            {/* <Link to={''} target='_blank'></Link> */}
+            {/* <FaYoutube /> */}
           </div>
         </div>
       </div>

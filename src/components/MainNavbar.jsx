@@ -3,6 +3,8 @@ import { CiHeart, CiSearch } from 'react-icons/ci';
 import { IoBagHandleOutline } from 'react-icons/io5';
 import MainLink from './MainLink';
 import logo from './../assets/images/logo.jpg';
+import { assets } from '../lib/data/Assets';
+import { Link } from 'react-router-dom';
 
 const MainNavbar = () => {
   return (
@@ -12,9 +14,11 @@ const MainNavbar = () => {
 
           <div className="hidden lg:flex items-center gap-2">
             <div className="">
-              <img src={logo} alt="" className='w-16 h-16'/>
+              {/* <img src={logo} alt="" className='w-16 h-16'/> */}
             </div>
-            <p className="text-3xl font-semibold">MozumderShopBd</p>
+            <Link to={'/'} className="text-3xl font-semibold">
+              <img src={assets.logo2} alt="" className='w-64' />
+            </Link>
           </div>
 
        

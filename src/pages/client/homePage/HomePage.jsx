@@ -11,6 +11,7 @@ import SocialSection from './homeComponents/SocialSection';
 import DofCard from './homeComponents/DofCard';
 import OrderForm from '../../../components/OrderForm';
 import VideoGallary from './homeComponents/VideoGallary';
+import ReviewSlider from '../../../components/ReviewSlider';
 
 const HomePage = () => {
   return (
@@ -19,7 +20,8 @@ const HomePage = () => {
       <KeyPoints />
       <DofCard />
       <VideoGallary/>
-      <OrderForm/>
+      <OrderForm />
+      <ReviewSlider/>
       
     </div>
   );
