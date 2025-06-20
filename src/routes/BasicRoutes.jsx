@@ -4,8 +4,12 @@ import HomePage from "../pages/client/homePage/HomePage";
 import ProductDetails from "../pages/client/homePage/ProductDetails";
 import DashboardLayout from "../layouts/DashboardLayout";
 import AllOrders from "../pages/admin/AllOrders";
+import AuthPage from "../pages/auth/AuthPage";
+import Unauthorized from "../pages/auth/Unauthorized";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
+  // customer layout 
   {
     path: '/',
     element: <Mainlayout />,
@@ -20,9 +24,13 @@ const router = createBrowserRouter([
       }
     ]
   },
+
+  // dashboard layout 
   {
     path: '/dashboard',
-    element: <DashboardLayout />,
+    element: <PrivateRoute allowedRoles={['super-admin']}>
+      <DashboardLayout />
+    </PrivateRoute>,
     children: [
       {
         path: '/dashboard',
@@ -30,9 +38,17 @@ const router = createBrowserRouter([
       },
       {
         path: 'all-orders',
-        element: <AllOrders/>
+        element: <AllOrders />
       }
     ]
+  },
+  {
+    path: '/auth',
+    element: <AuthPage />
+  },
+  {
+    path: '/unauthorized',
+    element: <Unauthorized />
   }
 
 

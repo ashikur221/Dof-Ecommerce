@@ -78,6 +78,7 @@ const MainLink = () => {
             <span className="text-white text-xl"><MdOutlinePhoneInTalk /></span>
             <span className="ml-2">(+088) 1813387605</span>
           </div>
+          
         </div>
       </nav>
 

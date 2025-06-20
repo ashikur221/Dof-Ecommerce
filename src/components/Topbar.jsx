@@ -1,10 +1,19 @@
 import React from 'react';
+import toast from 'react-hot-toast';
 import { FaAngleDown, FaFacebook, FaPhone, FaYoutube } from 'react-icons/fa';
 import { FiMapPin } from 'react-icons/fi';
 import { MdEmail, MdPhone } from 'react-icons/md';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Topbar = () => {
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+  const logout = () => {
+    localStorage.removeItem('token');
+    navigate('/')
+    toast.success('Logout successful');
+  }
+
   return (
     <div className="border-b py-2 bg-[#f59121]">
       <div className='w-10/12 mx-auto'>
@@ -19,12 +28,21 @@ const Topbar = () => {
             <p className='flex items-center'>USD<FaAngleDown /></p>
             <p>Sign In / Sign Up</p>
           </div> */}
-          <div className="text-xl flex gap-3">
+          <div className="text-xl flex items-center gap-3">
             <Link to={'https://www.facebook.com/share/1C1p37CKr8/'} target='_blank'>
               <FaFacebook />
             </Link>
-            {/* <Link to={''} target='_blank'></Link> */}
-            {/* <FaYoutube /> */}
+
+            {
+              token ?
+
+                <p onClick={() => logout()} className="text-sm cursor-pointer">Logout</p>
+                :
+                <Link to={'/auth'} >
+                  <p className="text-sm">Login/Register</p>
+                </Link>
+            }
+
           </div>
         </div>
       </div>
