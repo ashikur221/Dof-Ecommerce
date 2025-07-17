@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useAxiosPublic from '../../hooks/useAxiosPublic';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FaTrash, FaCheck } from 'react-icons/fa';
+import { FaTrash, FaCheck, FaSpinner } from 'react-icons/fa';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import toast from 'react-hot-toast';
 
@@ -12,6 +12,7 @@ const AllOrders = () => {
 
   const [filterStatus, setFilterStatus] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
   // Fetch Orders
   const { data: orders = [], isLoading, isError } = useQuery({
@@ -24,10 +25,41 @@ const AllOrders = () => {
 
   // Change Status Mutation
   const statusMutation = useMutation({
-    mutationFn: ({ id, status }) => axiosSecure.patch(`/order/${id}/status`, { status }),
-    onSuccess: () => {
+    mutationFn: async ({ id, status }) => {
+      // Validate status
+      const validStatuses = ['Pending', 'Approved', 'Cancelled', 'Delivered'];
+      if (!validStatuses.includes(status)) {
+        throw new Error('Invalid status value');
+      }
+
+      console.log('Updating order status:', { id, status });
+      console.log('API URL:', `${import.meta.env.VITE_BACKEND_URL}/order/${id}/status`);
+
+      // Log the token to check if it's being sent
+      const token = localStorage.getItem('token');
+      console.log('Token exists:', !!token);
+      console.log('Token preview:', token ? token.substring(0, 20) : 'No token');
+
+      console.log('Request payload:', { status });
+      console.log('Request URL:', `/order/${id}/status`);
+
+      const response = await axiosSecure.patch(`/order/${id}/status`, { status });
+      console.log('Status update response:', response.data);
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      console.log('✅ Status update successful:', variables);
       queryClient.invalidateQueries(['orders']);
-      toast.success('Status updated successfully');
+      toast.success(`Status updated to ${variables.status} successfully`);
+    },
+    onError: (error) => {
+      console.error('❌ Status update error:', error);
+      console.error('❌ Error response:', error.response);
+      console.error('❌ Error message:', error.message);
+      toast.error(error.response?.data?.message || 'Failed to update status');
+    },
+    onSettled: () => {
+      setUpdatingOrderId(null); // Reset after mutation finishes
     }
   });
 
@@ -37,6 +69,10 @@ const AllOrders = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['orders']);
       toast.success('Order deleted successfully');
+    },
+    onError: (error) => {
+      console.error('Delete error:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete order');
     }
   });
 
@@ -119,21 +155,33 @@ const AllOrders = () => {
                   <select
                     className="border rounded px-2 py-1"
                     value={order.status}
-                    onChange={(e) => statusMutation.mutate({ id: order._id, status: e.target.value })}
+                    onChange={(e) => {
+                      setUpdatingOrderId(order._id); // Set before mutation
+                      statusMutation.mutate({ id: order._id, status: e.target.value });
+                    }}
+                    disabled={updatingOrderId === order._id && statusMutation.isPending}
                   >
                     <option value="Pending">Pending</option>
                     <option value="Approved">Approved</option>
                     <option value="Cancelled">Cancelled</option>
                     <option value="Delivered">Delivered</option>
                   </select>
+                  {updatingOrderId === order._id && statusMutation.isPending && (
+                    <FaSpinner className="inline ml-2 animate-spin text-blue-500" />
+                  )}
                 </td>
 
                 <td className="py-3 px-4 text-center space-x-2">
                   <button
                     onClick={() => deleteMutation.mutate(order._id)}
+                    disabled={deleteMutation.isPending}
                     className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded"
                   >
-                    <FaTrash />
+                    {deleteMutation.isPending ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaTrash />
+                    )}
                   </button>
                 </td>
               </tr>
