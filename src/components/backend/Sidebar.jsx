@@ -42,8 +42,8 @@ const Sidebar = () => {
             <FaHome /> All Orders
           </Link>
 
-          <Link to="/dashboard/upload-product" className="flex items-center gap-3 hover:text-orange-400">
-            <FaHome /> Upload Product
+          <Link to="/dashboard/product-list" className="flex items-center gap-3 hover:text-orange-400">
+            <FaHome /> All Products
           </Link>
 
           <a href="#" className="flex items-center gap-3 hover:text-orange-400">

@@ -8,6 +8,7 @@ import AuthPage from "../pages/auth/AuthPage";
 import Unauthorized from "../pages/auth/Unauthorized";
 import PrivateRoute from "./PrivateRoute";
 import UploadProduct from "../pages/admin/UploadProduct";
+import ProductLists from "../pages/admin/ProductLists";
 
 const router = createBrowserRouter([
   // customer layout 
@@ -37,9 +38,14 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: <div>Dashboard</div>
       },
+      
       {
         path: 'all-orders',
         element: <AllOrders />
+      },
+      {
+        path: "product-list",
+        element: <ProductLists/>
       },
       {
         path: 'upload-product',
