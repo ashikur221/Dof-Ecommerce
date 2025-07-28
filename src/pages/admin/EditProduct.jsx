@@ -1,58 +1,121 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { uploadImg } from '../../uploadFile/UploadImg';
+import { Editor } from '@tinymce/tinymce-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import { uploadImg } from '../../uploadFile/UploadImg';
 import toast from 'react-hot-toast';
 import { FaSpinner } from 'react-icons/fa';
-import { Editor } from '@tinymce/tinymce-react';
-import { useNavigate } from 'react-router-dom';
 
 const tinymceApiKey = import.meta.env.VITE_TINYMCE_API_KEY;
 
-const UploadProduct = () => {
+const EditProduct = () => {
+  const { id } = useParams();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState([]);
   const [description, setDescription] = useState('');
   const [specification, setSpecification] = useState('');
-  const axiosSecure = useAxiosSecure();
   const [featuredPreview, setFeaturedPreview] = useState(null);
+  const [featuredFile, setFeaturedFile] = useState(null);
   const [productPreviews, setProductPreviews] = useState([]);
-  const navigate = useNavigate();
+  const [existingProduct, setExistingProduct] = useState(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
     setValue
   } = useForm();
 
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axiosSecure.get(`/product/${id}`);
+        const product = res.data;
+        setExistingProduct(product);
+        setValue('title', product.name);
+        setValue('category', product.category);
+        setValue('price', product.price);
+        setValue('discountPrice', product.discountPrice);
+        setValue('stock', product.stock);
+        setDescription(product.description || '');
+        setSpecification(product.specs);
+        setFeaturedPreview(product.image);
+        setProductPreviews(
+          (product.images || []).map(url => ({ file: null, url }))
+        );
+      } catch (err) {
+        toast.error('Failed to fetch product');
+      }
+    };
+    fetchProduct();
+    // eslint-disable-next-line
+  }, [id, setValue]);
+
+  // Handle featured image change
+  const handleFeaturedChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFeaturedPreview(URL.createObjectURL(file));
+      setFeaturedFile(file);
+    } else {
+      setFeaturedPreview(existingProduct?.image || null);
+      setFeaturedFile(null);
+    }
+  };
+
+  // Handle product images change
+  const handleProductImgsChange = (e) => {
+    const files = Array.from(e.target.files);
+    setProductPreviews([
+      ...productPreviews,
+      ...files.map(file => ({ file, url: URL.createObjectURL(file) }))
+    ]);
+  };
+
+  // Remove a product image
+  const removeProductImg = (idx) => {
+    setProductPreviews(productPreviews.filter((_, i) => i !== idx));
+  };
+
+  // Remove featured image
+  const removeFeaturedImg = () => {
+    setFeaturedPreview(null);
+    setFeaturedFile(null);
+    // Optionally, you can set a flag to remove the image from backend
+  };
+
+  // Submit handler
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    const toastId = toast.loading('Uploading product...');
-
+    const toastId = toast.loading('Updating product...');
     try {
-      // Upload featured image
-      const featuredImageFile = featuredPreview
-        ? productPreviews.length > 0
-          ? productPreviews[0].file
-          : data.featuredImage[0]
-        : data.featuredImage[0];
-      const featuredImageUrl = await uploadImg(featuredImageFile);
+      // Upload new featured image if changed
+      let featuredImageUrl = existingProduct?.image;
+      if (featuredFile) {
+        featuredImageUrl = await uploadImg(featuredFile);
+      }
 
-      // Upload product images
-      const productImagesFiles = productPreviews.map(p => p.file);
-      const productImagesUrls = await Promise.all(
-        productImagesFiles.map(file => uploadImg(file))
+      // Upload new product images if any
+      const uploadedImgs = await Promise.all(
+        productPreviews.map(async (img) => {
+          if (img.file) {
+            return await uploadImg(img.file);
+          }
+          return img.url; // already uploaded
+        })
       );
 
       // Prepare product data
       const productData = {
         name: data.title,
-        description: description, // Use TinyMCE content
+        description,
         image: featuredImageUrl,
-        images: productImagesUrls,
+        images: uploadedImgs,
         specs: specification,
         price: data.price,
         discountPrice: data.discountPrice || data.price,
@@ -60,34 +123,28 @@ const UploadProduct = () => {
         stock: data.stock || 0
       };
 
-      console.log(productData);
+      // Update product
+      await axiosSecure.put(`/product/${id}`, productData);
 
-      // Submit to backend
-      const response = await axiosSecure.post('/product', productData);
-
-      if (response.data) {
-        toast.success('Product uploaded successfully!', { id: toastId });
-        reset();
-        setDescription('');
-        setSpecification('');
-        setUploadedImages([]);
-      }
-      navigate('/dashboard/product-list'); // Redirect to product list after upload
+      toast.success('Product updated!', { id: toastId });
+      navigate('/dashboard/product-list'); // Change to your product list route
     } catch (error) {
-      console.error('Upload error:', error);
-      toast.error(error.response?.data?.message || 'Failed to upload product', { id: toastId });
+      toast.error(error.response?.data?.message || 'Failed to update product');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (!existingProduct) {
+    return <div className="p-6">Loading...</div>;
+  }
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Upload Product</h1>
+      <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
       <form
-        className=" bg-white p-6 rounded shadow space-y-5"
+        className="    bg-white p-6 rounded shadow space-y-5"
         onSubmit={handleSubmit(onSubmit)}
-        id="upload-product-form"
       >
         {/* Title */}
         <div>
@@ -131,9 +188,6 @@ const UploadProduct = () => {
               content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14}'
             }}
           />
-          {!description.trim() && (
-            <p className="text-red-500 text-sm mt-1">Description is required</p>
-          )}
         </div>
 
         {/* Category */}
@@ -218,33 +272,9 @@ const UploadProduct = () => {
           <input
             type="file"
             id="featuredImage"
-            {...register("featuredImage", {
-              required: "Featured image is required",
-              validate: {
-                fileSize: (files) => {
-                  if (files[0] && files[0].size > 5 * 1024 * 1024) {
-                    return "File size must be less than 5MB";
-                  }
-                  return true;
-                },
-                fileType: (files) => {
-                  if (files[0] && !files[0].type.startsWith('image/')) {
-                    return "File must be an image";
-                  }
-                  return true;
-                }
-              }
-            })}
             accept="image/*"
             className={`w-full ${errors.featuredImage ? 'border-red-500' : ''}`}
-            onChange={e => {
-              const file = e.target.files[0];
-              if (file) {
-                setFeaturedPreview(URL.createObjectURL(file));
-              } else {
-                setFeaturedPreview(null);
-              }
-            }}
+            onChange={handleFeaturedChange}
           />
           {featuredPreview && (
             <div className="mt-2 relative w-fit">
@@ -252,19 +282,11 @@ const UploadProduct = () => {
               <button
                 type="button"
                 className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 text-xs"
-                onClick={() => {
-                  setFeaturedPreview(null);
-                  setValue('featuredImage', null);
-                  // Clear the input value
-                  document.getElementById('featuredImage').value = '';
-                }}
+                onClick={removeFeaturedImg}
               >
                 ✕
               </button>
             </div>
-          )}
-          {errors.featuredImage && (
-            <p className="text-red-500 text-sm mt-1">{errors.featuredImage.message}</p>
           )}
         </div>
 
@@ -274,40 +296,10 @@ const UploadProduct = () => {
           <input
             type="file"
             id="productImgs"
-            multiple
-            {...register("productImgs", {
-              validate: {
-                fileSize: (files) => {
-                  if (files) {
-                    for (let file of files) {
-                      if (file.size > 5 * 1024 * 1024) {
-                        return "Each file must be less than 5MB";
-                      }
-                    }
-                  }
-                  return true;
-                },
-                fileType: (files) => {
-                  if (files) {
-                    for (let file of files) {
-                      if (!file.type.startsWith('image/')) {
-                        return "All files must be images";
-                      }
-                    }
-                  }
-                  return true;
-                }
-              }
-            })}
             accept="image/*"
+            multiple
             className={`w-full ${errors.productImgs ? 'border-red-500' : ''}`}
-            onChange={e => {
-              const files = Array.from(e.target.files);
-              setProductPreviews(files.map(file => ({
-                file,
-                url: URL.createObjectURL(file)
-              })));
-            }}
+            onChange={handleProductImgsChange}
           />
           {productPreviews.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
@@ -317,24 +309,13 @@ const UploadProduct = () => {
                   <button
                     type="button"
                     className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 text-xs"
-                    onClick={() => {
-                      const newPreviews = productPreviews.filter((_, i) => i !== idx);
-                      setProductPreviews(newPreviews);
-                      // Update the input value and react-hook-form
-                      const dt = new DataTransfer();
-                      newPreviews.forEach(p => dt.items.add(p.file));
-                      document.getElementById('productImgs').files = dt.files;
-                      setValue('productImgs', dt.files);
-                    }}
+                    onClick={() => removeProductImg(idx)}
                   >
                     ✕
                   </button>
                 </div>
               ))}
             </div>
-          )}
-          {errors.productImgs && (
-            <p className="text-red-500 text-sm mt-1">{errors.productImgs.message}</p>
           )}
         </div>
 
@@ -366,16 +347,16 @@ const UploadProduct = () => {
 
         <button
           type="submit"
-          disabled={isSubmitting || !description.trim()}
+          disabled={isSubmitting}
           className="bg-[#22404B] text-white px-6 py-2 rounded hover:bg-[#18313a] transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isSubmitting ? (
             <>
               <FaSpinner className="animate-spin" />
-              Uploading...
+              Updating...
             </>
           ) : (
-            'Upload Product'
+            'Update Product'
           )}
         </button>
       </form>
@@ -383,4 +364,4 @@ const UploadProduct = () => {
   );
 };
 
-export default UploadProduct;
+export default EditProduct;

@@ -9,6 +9,7 @@ import Unauthorized from "../pages/auth/Unauthorized";
 import PrivateRoute from "./PrivateRoute";
 import UploadProduct from "../pages/admin/UploadProduct";
 import ProductLists from "../pages/admin/ProductLists";
+import EditProduct from "../pages/admin/EditProduct";
 
 const router = createBrowserRouter([
   // customer layout 
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: 'upload-product',
         element: <UploadProduct />
+      },
+      {
+        path: "edit-product/:id",
+        element: <EditProduct/>
       }
     ]
   },

@@ -46,12 +46,7 @@ const Sidebar = () => {
             <FaHome /> All Products
           </Link>
 
-          <a href="#" className="flex items-center gap-3 hover:text-orange-400">
-            <FaUser /> Profile
-          </a>
-          <a href="#" className="flex items-center gap-3 hover:text-orange-400">
-            <FaChartBar /> Analytics
-          </a>
+         
           <div onClick={logout} className="flex cursor-pointer items-center gap-3 hover:text-orange-400">
             <BiLogOut /> Logout
           </div>

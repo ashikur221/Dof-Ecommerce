@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { dofProducts } from '../lib/data/DataBase';
 import useAxiosPublic from '../hooks/useAxiosPublic';
 import toast from 'react-hot-toast';
+import { useQuery } from '@tanstack/react-query';
 
 const OrderForm = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const [selectedProduct, setSelectedProduct] = useState(dofProducts[0]);
-  const [delivery, setDelivery] = useState(70); // Default: Inside Dhaka
-
-  const subtotal = selectedProduct.discountPrice;
-  const total = subtotal + delivery;
   const axiosPublic = useAxiosPublic();
+
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const res = await axiosPublic.get('/product');
+      return res?.data || [];
+    }
+  });
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [delivery, setDelivery] = useState(130); // Default: Inside Dhaka
+
+  // Set the first product as selected when products load
+  useEffect(() => {
+    if (products && products.length > 0 && !selectedProduct) {
+      setSelectedProduct(products[0]);
+    }
+  }, [products]);
+
+  const subtotal = selectedProduct?.discountPrice || selectedProduct?.price || 0;
+  const total = parseFloat(subtotal) + parseFloat(delivery);
 
   const onSubmit = async (data) => {
     const fullData = {
@@ -22,7 +38,7 @@ const OrderForm = () => {
       total
     };
     console.log("✅ Order Placed:", fullData);
-    const toastId = toast.loading('Uploading....')
+    const toastId = toast.loading('Uploading....');
     try {
       const res = await axiosPublic.post('/order', fullData);
       if (res) {
@@ -30,10 +46,12 @@ const OrderForm = () => {
         toast.success('Your form submitted successfully', { id: toastId });
       }
     } catch (error) {
-      toast.error('some error occurred', { id: toastId });
+      toast.error('Some error occurred', { id: toastId });
       console.log(error);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="w-11/12 max-w-3xl mx-auto my-10">
@@ -81,15 +99,15 @@ const OrderForm = () => {
           <label className="block font-medium">প্রোডাক্ট নির্বাচন করুন *</label>
           <select
             className="w-full border px-4 py-2 rounded mt-1"
-            value={selectedProduct.id}
+            value={selectedProduct?._id || ''}
             onChange={(e) => {
-              const product = dofProducts.find(p => p.id === e.target.value);
+              const product = products?.find(p => p._id === e.target.value);
               setSelectedProduct(product);
             }}
           >
-            {dofProducts.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name} - {item.discountPrice}৳
+            {products?.map((item) => (
+              <option key={item._id} value={item._id}>
+                {item?.name} - {item?.discountPrice || item?.price}৳
               </option>
             ))}
           </select>
@@ -106,17 +124,9 @@ const OrderForm = () => {
                 checked={delivery === 70}
                 onChange={() => setDelivery(70)}
               />
-              Inside Dhaka (+৭০৳)
+               Delivery Charge  (১৩০৳ সারা বাংলাদেশ)
             </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                value={130}
-                checked={delivery === 130}
-                onChange={() => setDelivery(130)}
-              />
-              Outside Dhaka (+১৩০৳)
-            </label>
+           
           </div>
         </div>
 
